@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Dashboard</h1>
+
+    <form action="/add-menu" method="POST">
+        <h2>Add Menu Item</h2>
+        <input type="text" name="itemName" placeholder="Item Name" required>
+        <input type="number" name="gramsPerPerson" placeholder="Grams Per Person" required>
+        <button type="submit">Add</button>
+    </form>
+
+    <h2>Menu Items</h2>
+    <ul>
+        <% menuItems.forEach(item => { %>
+            <li><%= item.itemName %>: <%= item.gramsPerPerson %>g/person</li>
+        <% }) %>
+    </ul>
+
+    <form action="/calculate" method="POST">
+        <h2>Calculate</h2>
+        <input type="number" name="persons" placeholder="No. of Persons" required>
+        <% menuItems.forEach(item => { %>
+            <label><%= item.itemName %> (kg):</label>
+            <input type="number" name="<%= item.itemName %>" step="0.01">
+        <% }) %>
+        <button type="submit">Calculate</button>
+    </form>
+
+    <% if (results) { %>
+        <h2>Results</h2>
+        <ul>
+            <% results.forEach(result => { %>
+                <li><strong><%= result.itemName %>:</strong> <%= result.status %></li>
+            <% }) %>
+        </ul>
+    <% } %>
+
+    <h2>Past Calculations</h2>
+    <canvas id="pastCalculationsChart"></canvas>
+
+    <script>
+        const pastCalculations = <%- JSON.stringify(pastCalculations) %>;
+        const labels = pastCalculations.map(calc => new Date(calc.createdAt).toLocaleString());
+        const data = pastCalculations.map(calc => calc.items.length);
+
+        const ctx = document.getElementById('pastCalculationsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Number of Items Evaluated',
+                    data,
+                    borderColor: 'blue',
+                    fill: false,
+                }],
+            },
+        });
+    </script>
+</body>
+</html>

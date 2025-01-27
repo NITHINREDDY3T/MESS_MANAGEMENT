@@ -1,0 +1,3 @@
+<nav>
+    <a href="/dashboard">Dashboard</a>
+</nav>
